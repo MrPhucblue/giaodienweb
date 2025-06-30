@@ -113,14 +113,13 @@
     }
   
     .lookup-grid input, .lookup-grid select {
-      padding: .55rem;
-      border: 1px solid #ccc;
-      border-radius: 20px;
-      text-align: center;
-      font-size: 1rem;
-      background: #fff;
+      padding: 0.4rem 0.8rem;
+      font-size: 0.95rem;
+      width: auto;
+      min-width: 90px;
+      max-width: 150px;
     }
-  
+
     .lookup-grid select {
       width: 150px;
     }
@@ -130,12 +129,11 @@
     }
   
     .date-wrapper input {
-      width: 180px;
-      padding: .6rem 2.5rem .6rem .8rem;
-      font-size: 1rem;
-      border-radius: 20px;
+      width: 140px;
+      padding: 0.45rem 2rem 0.45rem 0.6rem;
+      font-size: 0.95rem;
     }
-  
+
     .calendar-icon {
       position: absolute;
       right: 1.2rem;
@@ -151,8 +149,9 @@
       color: #fff;
       border: none;
       border-radius: 20px;
-      padding: .6rem 1.6rem;
-      font-weight: 700;
+      padding: 0.45rem 1rem;       /* Giảm padding */
+      font-weight: 600;
+      font-size: 0.95rem;          /* Nhỏ lại một chút */padding: .6rem 1.6rem;
       cursor: pointer;
       transition: background-color 0.3s ease;
     }
