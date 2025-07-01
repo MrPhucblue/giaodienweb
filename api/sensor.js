@@ -9,7 +9,13 @@ async function readStore() {
   try {
     return JSON.parse(await fs.readFile(DATA_PATH, 'utf8'));
   } catch {
-    return { history: [], thresholds: { tempLow: -30, tempHigh: 30 } };
+    return {
+        history: [],
+        thresholds: {
+          tempLow1: -30, tempHigh1: 30,
+          tempLow2: -30, tempHigh2: 30
+        }
+      };
   }
 }
 async function writeStore(store) {
@@ -50,11 +56,19 @@ export default async function handler(req, res) {
     }
 
     /* threshold */
-    if (typeof tempLow === 'number' && typeof tempHigh === 'number') {
-      if (tempLow > tempHigh) return res.status(400).json({ message: 'tempLow ≤ tempHigh' });
-      store.thresholds = { tempLow, tempHigh };
+    if (
+      typeof tempLow1 === 'number' && typeof tempHigh1 === 'number' &&
+      typeof tempLow2 === 'number' && typeof tempHigh2 === 'number'
+    ) {
+      if (tempLow1 > tempHigh1 || tempLow2 > tempHigh2)
+        return res.status(400).json({ message: 'Ngưỡng thấp phải nhỏ hơn hoặc bằng ngưỡng cao' });
+      store.thresholds = { tempLow1, tempHigh1, tempLow2, tempHigh2 };
       changed = true;
-    } else if (tempLow !== undefined || tempHigh !== undefined) {
+    } else if ([tempLow1, tempHigh1, tempLow2, tempHigh2].some(v => v !== undefined)) {
+      return res.status(400).json({ message: 'Phải có đủ 4 ngưỡng' });
+    }     
+
+    else if (tempLow !== undefined || tempHigh !== undefined) {
       return res.status(400).json({ message: 'Need both tempLow & tempHigh' });
     }
 

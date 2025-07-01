@@ -332,11 +332,17 @@
   <div class="header">MÔ HÌNH HỆ THỐNG GIÁM SÁT XE TẢI ĐÔNG LẠNH DÙNG IoT ESP32</div>
 
   <div class="threshold-box">
-    <label>Ngưỡng trên:<input id="upperThreshold" type="number">°C</label>
-    <label style="margin-left:.8rem;">Ngưỡng dưới:<input id="lowerThreshold" type="number">°C</label>
+    <div>Ngưỡng cảm biến 1:</div>
+    <label>Ngưỡng trên:<input id="upperThreshold1" type="number">°C</label>
+    <label style="margin-left:.8rem;">Ngưỡng dưới:<input id="lowerThreshold1" type="number">°C</label>
+  </div>
+  <div class="threshold-box">
+    <div>Ngưỡng cảm biến 2:</div>
+    <label>Ngưỡng trên:<input id="upperThreshold2" type="number">°C</label>
+    <label style="margin-left:.8rem;">Ngưỡng dưới:<input id="lowerThreshold2" type="number">°C</label>
     <button onclick="updateThresholds()">Áp dụng</button>
     <div id="tempStatus" class="status-message">Trạng thái nhiệt độ: --</div>
-  </div>
+  </div>  
 
   <div class="dashboard">
     <div class="chart-container"><div class="sensor-card"><i class="fas fa-thermometer-half" style="color:#07d3f2;margin-right:8px"></i>Nhiệt độ 1: <span id="temp">--</span>°C</div><div id="tempChart" class="chart-box"></div></div>
@@ -531,9 +537,12 @@ async function fetchSensorData() {
     const { history, thresholds } = await r.json();
 
     if (thresholds) {
-      if (!upperThreshold.value) upperThreshold.value = thresholds.tempHigh;
-      if (!lowerThreshold.value) lowerThreshold.value = thresholds.tempLow;
+      if (!upperThreshold1.value) upperThreshold1.value = thresholds.tempHigh1;
+      if (!lowerThreshold1.value) lowerThreshold1.value = thresholds.tempLow1;
+      if (!upperThreshold2.value) upperThreshold2.value = thresholds.tempHigh2;
+      if (!lowerThreshold2.value) lowerThreshold2.value = thresholds.tempLow2;
     }
+
     // ✅ Vẽ lại toàn bộ dữ liệu
     if (Array.isArray(history) && history.length > 0) {
       history.forEach(updateCharts);  // ← Cập nhật toàn bộ biểu đồ từ lịch sử
@@ -560,7 +569,11 @@ async function fetchSensorData() {
 
 
   async function updateThresholds() {
-    const low = parseFloat(lowerThreshold.value), high = parseFloat(upperThreshold.value);
+    const low1 = parseFloat(lowerThreshold1.value),
+          high1 = parseFloat(upperThreshold1.value),
+          low2 = parseFloat(lowerThreshold2.value),
+          high2 = parseFloat(upperThreshold2.value);
+
     if (isNaN(low) || isNaN(high)) {
       alert('Nhập đủ hai ngưỡng!');
       return;
@@ -571,13 +584,18 @@ async function fetchSensorData() {
     }
     try {
       const r = await fetch('/api/sensor', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ tempLow: low, tempHigh: high })
-      });
-      if (!r.ok) throw new Error(await r.text());
-      alert('Đã lưu ngưỡng thành công!');
-      checkTempStatus();
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        tempLow1: low1,
+        tempHigh1: high1,
+        tempLow2: low2,
+        tempHigh2: high2
+      })
+    });
+    if (!r.ok) throw new Error(await r.text());
+    alert('Đã lưu ngưỡng thành công!');
+
     } catch (e) {
       alert('Lỗi: ' + e.message);
     }
