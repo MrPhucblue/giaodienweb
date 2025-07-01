@@ -766,6 +766,65 @@ async function fetchSensorData() {
   });
 }
 
+  // ✅ Thêm hàm xử lý áp dụng ngưỡng và lưu localStorage
+  function applyThreshold(sensorIndex) {
+    const lowInput = document.getElementById(`lowerThreshold${sensorIndex}`);
+    const highInput = document.getElementById(`upperThreshold${sensorIndex}`);
+    const statusEl = document.getElementById(`tempStatus${sensorIndex === 1 ? '1' : ''}`);
+
+    const low = parseFloat(lowInput.value);
+    const high = parseFloat(highInput.value);
+
+    if (isNaN(low) || isNaN(high)) {
+      statusEl.textContent = '⚠️ Vui lòng nhập đủ cả hai ngưỡng!';
+      statusEl.className = 'status-message warning';
+      return;
+    }
+
+    if (low > high) {
+      statusEl.textContent = '⚠️ Ngưỡng dưới phải nhỏ hơn hoặc bằng ngưỡng trên!';
+      statusEl.className = 'status-message warning';
+      return;
+    }
+
+    // Lưu localStorage
+    localStorage.setItem(`tempLow${sensorIndex}`, low);
+    localStorage.setItem(`tempHigh${sensorIndex}`, high);
+
+    // Gửi lên server
+    fetch('/api/sensor', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        [`tempLow${sensorIndex}`]: low,
+        [`tempHigh${sensorIndex}`]: high
+      })
+    })
+    .then(res => {
+      if (!res.ok) throw new Error('Lưu ngưỡng thất bại');
+      statusEl.textContent = '✅ Đã lưu ngưỡng thành công!';
+      statusEl.className = 'status-message normal';
+    })
+    .catch(err => {
+      statusEl.textContent = '❌ Lỗi: ' + err.message;
+      statusEl.className = 'status-message warning';
+    });
+  }
+
+  // ✅ Hàm khôi phục ngưỡng đã lưu
+  function restoreThresholdsFromLocalStorage() {
+    const t1Low = localStorage.getItem('tempLow1');
+    const t1High = localStorage.getItem('tempHigh1');
+    const t2Low = localStorage.getItem('tempLow2');
+    const t2High = localStorage.getItem('tempHigh2');
+
+    if (t1Low !== null) document.getElementById('lowerThreshold1').value = t1Low;
+    if (t1High !== null) document.getElementById('upperThreshold1').value = t1High;
+    if (t2Low !== null) document.getElementById('lowerThreshold2').value = t2Low;
+    if (t2High !== null) document.getElementById('upperThreshold2').value = t2High;
+  }
+
+restoreThresholdsFromLocalStorage();
 fetchSensorData();
 setInterval(fetchSensorData, 30000); // cập nhật mỗi 30 giây
 </script>
