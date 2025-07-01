@@ -107,11 +107,11 @@
       justify-content: center;
       align-items: center;
       gap: 1rem;
-      flex-wrap: wrap;
-      max-width: 600px;
+      flex-wrap: nowrap; /* ép nằm 1 hàng ngang */
+      max-width: 100%;
       margin: 0 auto 1rem;
     }
-  
+
     .lookup-grid input, .lookup-grid select {
       padding: 0.4rem 0.8rem;
       font-size: 0.95rem;
@@ -322,9 +322,41 @@
   -webkit-appearance: none;
  }
 }
+
+  /* Bo tròn input/select trong lookup và filter */
+  .lookup-grid input,
+  .lookup-grid select {
+    padding: 0.4rem 0.8rem;
+    font-size: 0.95rem;
+    border-radius: 6px;
+    border: 1px solid #ccc;
+    text-align: center;
+  }
+
+  .lookup-grid input[type="number"] {
+    min-width: 100px;
+  }
+
+  /* định dạng icon chỗ nhập dữ liệu */
+  .date-input-wrapper {
+    position: relative;
+    display: inline-block;
+  }
+
+  .date-input-wrapper input {
+    padding-right: 30px; /* để chừa chỗ icon */
+  }
+
+  .calendar-icon {
+    position: absolute;
+    right: 10px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #888;
+    pointer-events: none;
+  }
   </style>
   
-
   </style>
 </head>
 <body>
@@ -332,16 +364,17 @@
   <div class="header">MÔ HÌNH HỆ THỐNG GIÁM SÁT XE TẢI ĐÔNG LẠNH DÙNG IoT ESP32</div>
 
   <div class="threshold-box">
-    <div>Ngưỡng cảm biến 1:</div>
+    <div style="margin-bottom: 10px;">Ngưỡng cảm biến 1:</div>
     <label>Ngưỡng trên:<input id="upperThreshold1" type="number">°C</label>
     <label style="margin-left:.8rem;">Ngưỡng dưới:<input id="lowerThreshold1" type="number">°C</label>
+    <button onclick="applyThreshold1()">Áp dụng</button>
     <div id="tempStatus1" class="status-message">Trạng thái nhiệt độ: --</div>
-  </div>  
+  </div>    
   <div class="threshold-box">
-    <div>Ngưỡng cảm biến 2:</div>
+    <div style="margin-bottom: 10px;">Ngưỡng cảm biến 2:</div>
     <label>Ngưỡng trên:<input id="upperThreshold2" type="number">°C</label>
     <label style="margin-left:.8rem;">Ngưỡng dưới:<input id="lowerThreshold2" type="number">°C</label>
-    <button onclick="updateThresholds()">Áp dụng</button>
+    <button onclick="applyThreshold2()">Áp dụng</button>
     <div id="tempStatus" class="status-message">Trạng thái nhiệt độ: --</div>
   </div>  
 
@@ -409,10 +442,11 @@
         <input id="tempLookupDate" placeholder="yyyy/MM/dd">
         <i class="fas fa-calendar-alt calendar-icon"></i>
       </div>
-      <input type="number" id="tempMin" placeholder="Từ (°C)" style="min-width:120px;">
-      <input type="number" id="tempMax" placeholder="Đến (°C)" style="min-width:120px;">
+      <input type="number" id="tempMin" placeholder="Từ (°C)">
+      <input type="number" id="tempMax" placeholder="Đến (°C)">
       <button onclick="filterByTemperature()" class="lookup-btn">Lọc</button>
-    </div>    
+    </div>
+        
     <div class="table-container">
       <table>
         <thead>
@@ -683,7 +717,6 @@ async function fetchSensorData() {
     }
   });
 
-  
   function filterByTemperature() {
   const min = parseFloat(document.getElementById('tempMin').value);
   const max = parseFloat(document.getElementById('tempMax').value);
