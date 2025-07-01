@@ -807,6 +807,29 @@ async function fetchSensorData() {
 }
 
 restoreThresholdsFromLocalStorage();
+function syncThresholdsToServer() {
+  const t1Low = localStorage.getItem('tempLow1');
+  const t1High = localStorage.getItem('tempHigh1');
+  const t2Low = localStorage.getItem('tempLow2');
+  const t2High = localStorage.getItem('tempHigh2');
+
+  if (t1Low && t1High && t2Low && t2High) {
+    fetch('/api/sensor', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        tempLow1: parseFloat(t1Low),
+        tempHigh1: parseFloat(t1High),
+        tempLow2: parseFloat(t2Low),
+        tempHigh2: parseFloat(t2High)
+      })
+    }).catch(err => {
+      console.warn('Không thể đồng bộ ngưỡng với server:', err.message);
+    });
+  }
+}
+
+syncThresholdsToServer();
 fetchSensorData();
 setInterval(fetchSensorData, 30000); // cập nhật mỗi 30 giây
 </script>
