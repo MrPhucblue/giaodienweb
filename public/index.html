@@ -335,7 +335,8 @@
     <div>Ngưỡng cảm biến 1:</div>
     <label>Ngưỡng trên:<input id="upperThreshold1" type="number">°C</label>
     <label style="margin-left:.8rem;">Ngưỡng dưới:<input id="lowerThreshold1" type="number">°C</label>
-  </div>
+    <div id="tempStatus1" class="status-message">Trạng thái nhiệt độ: --</div>
+  </div>  
   <div class="threshold-box">
     <div>Ngưỡng cảm biến 2:</div>
     <label>Ngưỡng trên:<input id="upperThreshold2" type="number">°C</label>
@@ -505,6 +506,31 @@
     }
   }
 
+  function checkTempStatus1() {
+  const low = parseFloat(lowerThreshold1.value),
+        high = parseFloat(upperThreshold1.value),
+        t = parseFloat(temp.textContent) || NaN;
+
+  const status = document.getElementById('tempStatus1');
+
+  if (isNaN(t)) {
+    status.textContent = 'Trạng thái nhiệt độ: --';
+    status.className = 'status-message';
+    return;
+  }
+
+  if ((!isNaN(low) && t < low) || (!isNaN(high) && t > high)) {
+    let diff = '';
+    if (!isNaN(high) && t > high) diff = ` (vượt ${(t - high).toFixed(2)}°C)`;
+    else if (!isNaN(low) && t < low) diff = ` (thấp hơn ${(low - t).toFixed(2)}°C)`;
+    status.textContent = 'Trạng thái nhiệt độ: CẢNH BÁO' + diff;
+    status.className = 'status-message warning';
+  } else {
+    status.textContent = 'Trạng thái nhiệt độ: BÌNH THƯỜNG';
+    status.className = 'status-message normal';
+  }
+}
+
   let lastTs = 0;
   function updateCharts(p) {
     const { timestamp: ts, voltage, current, power, energy, temp1, temp2, frequency } = p;
@@ -528,8 +554,8 @@
       const el = document.getElementById(spanId);
       if (el) el.textContent = val.toFixed(2);
     });
-
     checkTempStatus();
+    checkTempStatus1();
   }
 async function fetchSensorData() {
   try {
@@ -565,8 +591,6 @@ async function fetchSensorData() {
     console.warn('Fetch error', e);
   }
 }
-
-
 
   async function updateThresholds() {
     const low1 = parseFloat(lowerThreshold1.value),
@@ -709,7 +733,7 @@ async function fetchSensorData() {
 }
 
 fetchSensorData();
-  setInterval(fetchSensorData, 30000); // cập nhật mỗi 30 giây
+setInterval(fetchSensorData, 30000); // cập nhật mỗi 30 giây
 </script>
 
 </body>
