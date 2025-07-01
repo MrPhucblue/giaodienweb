@@ -806,7 +806,7 @@ async function fetchSensorData() {
   });
 }
 
-restoreThresholdsFromLocalStorage();
+
 function syncThresholdsToServer() {
   const t1Low = localStorage.getItem('tempLow1');
   const t1High = localStorage.getItem('tempHigh1');
@@ -829,6 +829,21 @@ function syncThresholdsToServer() {
   }
 }
 
+function restoreThresholdsFromLocalStorage() {
+  const t1Low = localStorage.getItem('tempLow1');
+  const t1High = localStorage.getItem('tempHigh1');
+  const t2Low = localStorage.getItem('tempLow2');
+  const t2High = localStorage.getItem('tempHigh2');
+
+  if (t1Low !== null) document.getElementById('lowerThreshold1').value = t1Low;
+  if (t1High !== null) document.getElementById('upperThreshold1').value = t1High;
+  if (t2Low !== null) document.getElementById('lowerThreshold2').value = t2Low;
+  if (t2High !== null) document.getElementById('upperThreshold2').value = t2High;
+}
+
+
+
+restoreThresholdsFromLocalStorage();
 syncThresholdsToServer();
 fetchSensorData();
 setInterval(fetchSensorData, 30000); // cập nhật mỗi 30 giây
